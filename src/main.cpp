@@ -2650,6 +2650,7 @@ void setup()
   dsp_ok = dsp_begin ( INIPARS ) ;                       // Init display
   if ( dsp_ok )                                          // Init okay?
   {
+    ESP_LOGI ( TAG, "Display OK" ) ;
     dsp_erase() ;                                        // Clear screen
     dsp_setRotation() ;                                  // Usse landscape format
     dsp_setTextSize ( DEFTXTSIZ ) ;                      // Small character font
@@ -4310,17 +4311,19 @@ void displayinfo ( uint16_t inx )
     dsp_fillRect ( 0, p->y, width, p->height, BLACK ) ;    // Clear the space for new info
     if ( ( dsp_getheight() > 64 ) && ( p->y > 1 ) )        // Need and space for divider?
     {
-      dsp_fillRect ( 0, p->y - 4, width, 1, GREEN ) ;      // Yes, show divider above text
+      dsp_fillRect ( 0, p->y - 4, width, 1, WHITE ) ;      // Yes, show divider above text
     }
     len = p->str.length() ;                                // Required length of buffer
     if ( len++ )                                           // Check string length, set buffer length
     {
       char buf [ len ] ;                                   // Need some buffer space
       p->str.toCharArray ( buf, len ) ;                    // Make a local copy of the string
-      utf8ascii_ip ( buf ) ;                               // Convert possible UTF8
+      utf8ascii_ip ( buf ) ;                            // Convert possible UTF8
       dsp_setTextColor ( p->color ) ;                      // Set the requested color
-      dsp_setCursor ( 0, p->y ) ;                          // Prepare to show the info
+      dsp_setCursor ( 0, p->y + p->font_adjustment ) ;     // Prepare to show the info
+      dsp_setFont(p->font) ;                               // Set font
       dsp_println ( buf ) ;                                // Show the string
+      dsp_setFont(0) ;                                     // Reset font
     }
   }
 }

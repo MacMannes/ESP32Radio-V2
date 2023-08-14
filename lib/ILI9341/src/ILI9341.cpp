@@ -7,28 +7,54 @@
 // Below set your dsp_getwidth() and dsp_getwidth() to suite your display.
 
 #include "ILI9341.h"
+#include <Adafruit_GFX.h>    // Core graphics library
+#include <Fonts/FreeSans9pt7b.h>
+#include <Fonts/FreeSansBold12pt7b.h>
 
 // Data to display.  There are TFTSECS sections
 scrseg_struct     ILI9341_tftdata[TFTSECS] =                        // Screen divided in 3 segments + 1 overlay
-{                                                           // One text line is 8 pixels
-  { false, WHITE,   0,  8, "" },                            // 1 top line
-  { false, CYAN,   20, 64, "" },                            // 8 lines in the middle
-  { false, YELLOW, 90, 32, "" },                            // 4 lines at the bottom
-  { false, GREEN,  90, 32, "" }                             // 4 lines at the bottom for rotary encoder
-} ;
+{                                                             // One text line is 8 pixels
+  { false, WHITE,   0,  8, "", 0, 0 },                            // 1 top line
+  { false, WHITE,   20, 64, "", 1, 10 },                            // 8 lines in the middle
+  { false, YELLOW, 160, 32, "", 2, 18 },                            // 4 lines at the bottom
+  { false, GREEN,  160, 32, "", 0, 0 }                             // 4 lines at the bottom for rotary encoder
+};
 
 
 Adafruit_ILI9341*     ILI9341_tft ;                                       // For instance of display driver
 
+const char* TFT_TAG = "tft" ;                            // For debug lines
 
 bool ILI9341_dsp_begin ( int8_t cs, int8_t dc )
 {
   if ( ( ILI9341_tft = new Adafruit_ILI9341 ( cs, dc ) ) )                // Create an instance for TFT
   {
+    ESP_LOGI ( TFT_TAG, "INIT DISPLAY" ) ;
     ILI9341_tft->begin() ;                                                // Init TFT interface
+    ILI9341_tft->setRotation(3);
+    ILI9341_tft->fillScreen(ILI9341_BLACK);
+    ESP_LOGI ( TFT_TAG, "INIT DISPLAY DONE" ) ;
   }
   return ( ILI9341_tft != NULL ) ;
 }
+
+void ILI9341_setFont ( uint8_t fontNumber ) {
+    switch (fontNumber) {
+        case 1: {
+            ILI9341_tft->setFont(&FreeSans9pt7b);
+            break;
+        }
+        case 2: {
+            ILI9341_tft->setFont(&FreeSansBold12pt7b);
+            break;
+        }
+        default: {
+            ILI9341_tft->setFont();
+            break;
+        }
+    }
+}
+
 
 //**************************************************************************************************
 //                                      D I S P L A Y B A T T E R Y                                *
@@ -115,6 +141,7 @@ void ILI9341_displaytime ( const char* str, uint16_t color )
   }
   if ( ILI9341_tft )                               // TFT active?
   {
+    ILI9341_tft->setFont();
     dsp_setTextColor ( color ) ;                   // Set the requested color
     for ( i = 0 ; i < 8 ; i++ )                    // Compare old and new
     {

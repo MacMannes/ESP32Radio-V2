@@ -37,6 +37,8 @@ struct scrseg_struct                                  // For screen segments
   uint16_t y ;                                        // Begin of segment row
   uint16_t height ;                                   // Height of segment
   String   str ;                                      // String to be displayed
+  uint16_t font ;
+  uint16_t font_adjustment ;
 } ;
 
 
@@ -62,7 +64,8 @@ extern Adafruit_ILI9341*    ILI9341_tft ;                                 // For
 #define dsp_getwidth()          320                                       // Adjust to your display
 #define dsp_getheight()         240                                       // Get height of screen
 #define dsp_update(a)                                                     // Updates to the physical screen
-#define dsp_begin               ILI9341_dsp_begin                         // Init driver
+#define dsp_begin(a)            ILI9341_dsp_begin(TFT_CS, TFT_DC)         // Init driver
+#define dsp_setFont(f)          ILI9341_setFont ( f )                     // Set font
 
 extern scrseg_struct     ILI9341_tftdata[TFTSECS] ;                       // Screen divided in segments
 
@@ -70,5 +73,6 @@ void ILI9341_displaybattery ( uint16_t bat0, uint16_t bat100, uint16_t adcval ) 
 void ILI9341_displayvolume  ( uint8_t vol ) ;
 void ILI9341_displaytime    ( const char* str, uint16_t color = 0xFFFF ) ;
 bool ILI9341_dsp_begin      ( int8_t cs, int8_t dc ) ;
+void ILI9341_setFont        ( uint8_t fontNumber );
 
 #endif
